@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { Div } from "./MovieInfo.style";
@@ -10,24 +10,22 @@ const MovieInfo = () => {
   const [people, setPeople] = useState([]);
   const [films, SetFilms] = useState({});
 
-  const fetch = async () => {
+  const fetch = useCallback(async () => {
     try {
       const response = await axios.get(`https://swapi.dev/api/films/${id}`);
       SetFilms(response.data);
     } catch (err) {
       console.error(err);
     }
-  };
-  let xters = [];
-  // xters = [];
+  }, [id]);
 
-  const getCharacter = async () => {
+  const getCharacter = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`https://swapi.dev/api/films/${id}`);
 
       const characters = response.data.characters;
-
+      let xters = [];
       characters.map(async (character) => {
         const response = await axios.get(character);
         const characterData = response.data;
@@ -39,15 +37,15 @@ const MovieInfo = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     getCharacter();
-  }, []);
+  }, [getCharacter]);
 
   useEffect(() => {
     fetch();
-  }, []);
+  }, [fetch]);
 
   return (
     <>
@@ -58,8 +56,6 @@ const MovieInfo = () => {
             position: "absolute",
             top: "40%",
             right: "50%",
-            // backgroundColor: "rgba(0, 0, 29)",
-            // transform: "translate(50%,50%)",
           }}
           size={40}
           speedMultiplier={1}
@@ -69,7 +65,7 @@ const MovieInfo = () => {
           <div className="header">
             <img src={swlogo} alt="swlogo" width={70} />
             <h1>{films.title}</h1>
-            <marquee direction="down" padding-top="10">
+            <marquee direction="up" padding-top="10" scrollamount="2">
               <p>{films.opening_crawl}</p>{" "}
             </marquee>
           </div>
